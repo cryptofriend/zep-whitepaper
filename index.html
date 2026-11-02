@@ -1,0 +1,1087 @@
+<title>ZEP Whitepaper</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap">
+<style>
+/* Layout: a paper. One reading column of about 66 characters, a quiet numbered contents rail on the left at desktop width,
+   figures that may break a little wider than the text. Brand: Zephyrium sea green on green-tinted neutrals. */
+:root{
+  --canvas:#F6F8F7; --surface:#FFFFFF; --subtle:#EDF2EF; --hover:#E7EEEB;
+  --text:#192824; --text-2:#52645F; --muted:#586B62; --ink:#203D37;
+  --border:#D8E2DD; --border-strong:#768D81;
+  --accent:#207B73; --accent-hover:#19675F; --accent-subtle:#EDF8F4; --on-accent:#FFFFFF;
+  --warn:#95600B; --warn-bg:#FFF4DE;
+  --c-ico:#768D81; --c-val:#19675F; --c-lp:#50AE9E; --c-dao:#092824;
+  --display:'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --body:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --mono:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --canvas:#101816; --surface:#18231F; --subtle:#131E19; --hover:#293930;
+    --text:#EFF5F0; --text-2:#B4C3B9; --muted:#94A89B; --ink:#EFF5F0;
+    --border:#35483D; --border-strong:#788D80;
+    --accent:#74C8BD; --accent-hover:#8BD5CA; --accent-subtle:#173C35; --on-accent:#0F2E29;
+    --warn:#E8C47B; --warn-bg:#382C17; --c-ico:#788D80; --c-val:#74C8BD; --c-lp:#369588; --c-dao:#BCE1D6;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --canvas:#101816; --surface:#18231F; --subtle:#131E19; --hover:#293930;
+  --text:#EFF5F0; --text-2:#B4C3B9; --muted:#94A89B; --ink:#EFF5F0;
+  --border:#35483D; --border-strong:#788D80;
+  --accent:#74C8BD; --accent-hover:#8BD5CA; --accent-subtle:#173C35; --on-accent:#0F2E29;
+  --warn:#E8C47B; --warn-bg:#382C17; --c-ico:#788D80; --c-val:#74C8BD; --c-lp:#369588; --c-dao:#BCE1D6;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} *{animation:none!important;transition:none!important} }
+body{margin:0;background:var(--canvas);color:var(--text);font:17px/1.65 var(--body);-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:3px}
+a:hover{color:var(--accent-hover)}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
+h1,h2,h3,p,figure{margin:0}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;color:var(--ink)}
+.skip{position:absolute;left:16px;top:-80px;background:var(--accent);color:var(--on-accent);padding:8px 12px;border-radius:4px;z-index:50}
+.skip:focus{top:8px}
+.eyebrow{font:12px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.12em;color:var(--accent)}
+.mono{font-family:var(--mono)}
+.muted{color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+
+/* Masthead */
+.masthead{border-bottom:1px solid var(--border);background:var(--surface)}
+.masthead .in{max-width:1180px;margin:0 auto;padding-block:14px;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.lockup{display:inline-flex;align-items:center;gap:11px;color:var(--text);text-decoration:none;font-weight:600;font-size:18px;letter-spacing:-.6px}
+.lockup svg{width:28px;height:28px;display:block}
+.status{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font:12px/1.4 var(--mono);color:var(--muted)}
+.status .tag{border:1px solid var(--border);border-radius:3px;padding:4px 8px}
+.status .tag.live{color:var(--accent);border-color:var(--accent)}
+
+/* Shell */
+.shell{max-width:1180px;margin:0 auto;padding-block:0 72px;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));display:grid;grid-template-columns:220px minmax(0,1fr);gap:56px}
+.toc{position:sticky;top:calc(env(safe-area-inset-top, 0px) + 24px);align-self:start;padding-top:48px;max-height:calc(100vh - 48px);overflow:auto}
+.toc ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.toc a{display:grid;grid-template-columns:28px 1fr;gap:6px;color:var(--text-2);text-decoration:none;font-size:13.5px;line-height:1.35;padding:6px 8px;border-radius:5px}
+.toc a .n{font:12px/1.5 var(--mono);color:var(--muted)}
+.toc a:hover{background:var(--hover);color:var(--text)}
+.toc a[aria-current="true"]{background:var(--accent-subtle);color:var(--accent)}
+.toc a[aria-current="true"] .n{color:var(--accent)}
+.toc-mobile{display:none}
+
+/* Paper */
+.paper{max-width:66ch;min-width:0;padding-top:48px}
+.titleblock{text-align:center;padding-bottom:28px;margin-bottom:28px;border-bottom:1px solid var(--border)}
+.titleblock h1{font-size:clamp(2rem, 5.2vw, 3.1rem);font-weight:500;line-height:1.12;letter-spacing:-.01em;margin-top:14px}
+.titleblock .authors{margin-top:18px;color:var(--text-2);font-size:15px;line-height:1.7}
+.titleblock .authors a{color:var(--text-2)}
+.abstract p{text-align:justify;hyphens:auto}
+.abstract b{font-weight:600}
+section{margin-top:44px}
+section h2{font-size:1.65rem;font-weight:600;line-height:1.2;display:flex;gap:12px;align-items:baseline;margin-bottom:14px}
+section h2 .n{font-family:var(--mono);font-size:.78rem;color:var(--muted);letter-spacing:.04em}
+section h3{font-size:1.2rem;font-weight:600;margin:22px 0 6px}
+.paper p+p{margin-top:14px}
+.paper p{text-wrap:pretty}
+.lead{font-family:var(--display);font-size:1.45rem;line-height:1.35;color:var(--ink);font-weight:500;margin:22px 0 10px}
+.thesis{border-left:2px solid var(--accent);padding:6px 0 6px 20px;margin:22px 0}
+.thesis p{font-family:var(--display);font-size:1.5rem;line-height:1.3;color:var(--ink);font-weight:500;font-style:italic}
+ul.plain,ol.plain{padding-left:1.2em;margin:12px 0}
+ul.plain li,ol.plain li{margin:8px 0}
+dl.freedoms{margin:18px 0 0;display:grid;gap:14px}
+dl.freedoms>div{display:grid;grid-template-columns:minmax(0,1fr);gap:4px;padding:14px 16px;border:1px solid var(--border);border-radius:8px;background:var(--surface)}
+dl.freedoms dt{font-family:var(--display);font-weight:600;font-size:1.25rem;color:var(--ink)}
+dl.freedoms dd{margin:0;color:var(--text-2);font-size:15.5px}
+dl.freedoms dd .t{display:block;margin-top:6px;font:13px/1.5 var(--mono);color:var(--accent)}
+dl.tools{margin:16px 0 0}
+dl.tools dt{font-weight:600;margin-top:16px}
+dl.tools dd{margin:4px 0 0;color:var(--text-2)}
+
+/* Figures */
+figure{margin:26px 0;border:1px solid var(--border);border-radius:10px;background:var(--surface);overflow:hidden}
+figure.wide{width:min(100%, 820px)}
+@media (min-width:1100px){ figure.wide{width:calc(100% + 120px);margin-left:-60px} }
+figcaption{padding:12px 16px;border-top:1px solid var(--border);font-size:13.5px;line-height:1.55;color:var(--text-2)}
+figcaption b{color:var(--text);font-weight:600}
+.fig-head{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.fig-head .eyebrow{color:var(--muted)}
+.seg{display:inline-flex;gap:3px;padding:3px;background:var(--subtle);border-radius:7px;flex-wrap:wrap}
+.seg button{border:0;background:none;color:var(--text-2);font-size:13.5px;padding:6px 11px;border-radius:5px}
+.seg button:hover{background:var(--hover);color:var(--text)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.btn{border:1px solid var(--border-strong);background:var(--surface);color:var(--text);border-radius:6px;padding:7px 12px;font-size:13.5px}
+.btn:hover{background:var(--hover)}
+.btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+
+/* Figure 1: connector */
+.connector{padding:8px 8px 0}
+.connector svg{width:100%;height:auto;display:block;font-family:var(--body)}
+.connector .wire{stroke:var(--border-strong);stroke-width:1.4;fill:none;transition:opacity .4s}
+.connector .wire.direct{opacity:0;stroke:var(--accent);stroke-dasharray:5 5}
+.connector.gone .wire.via{opacity:.08}
+.connector.gone .wire.direct{opacity:.95}
+.connector .box{fill:var(--surface);stroke:var(--border-strong);stroke-width:1.2;transition:opacity .4s}
+.connector .node{cursor:pointer}
+.connector .node:hover .box,.connector .node:focus-visible .box{stroke:var(--accent);stroke-width:1.8}
+.connector .node.on .box{fill:var(--accent-subtle);stroke:var(--accent);stroke-width:1.8}
+.connector text{fill:var(--text);font-size:13px}
+.connector text.small{fill:var(--muted);font-size:11px}
+.connector text.lbl{fill:var(--muted);font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-family:var(--mono)}
+.connector .zep .box{fill:var(--accent);stroke:var(--accent)}
+.connector .zep text{fill:var(--on-accent);font-weight:600}
+.connector.gone .zep{opacity:.18}
+.connector .group{fill:none;stroke:var(--border);stroke-dasharray:4 4}
+.connector .eth .box{fill:var(--subtle)}
+.connector .you .box{fill:var(--subtle)}
+.connector .legend{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:12px 16px 14px;flex-wrap:wrap}
+.connector .legend p{font-size:14px;color:var(--text-2);flex:1 1 320px;min-width:0;margin:0}
+.connector .legend p b{color:var(--text)}
+
+/* Figure 2: table */
+.tbl{width:100%;border-collapse:collapse;font-size:14.5px}
+.tbl th,.tbl td{text-align:left;vertical-align:top;padding:11px 14px;border-top:1px solid var(--border)}
+.tbl thead th{border-top:0;font:12px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:500;padding-top:14px}
+.tbl td:first-child,.tbl th:first-child{font-weight:600;color:var(--text);white-space:nowrap}
+.tbl td.bank{color:var(--text-2)}
+.tbl td.zep{color:var(--text)}
+.tbl td.zep b{color:var(--accent);font-weight:600}
+.tbl-wrap{overflow-x:auto}
+
+/* Figure 3: the stack */
+.stack{padding:4px 16px 0}
+.layer{display:grid;grid-template-columns:132px minmax(0,1fr);gap:12px;align-items:start;padding:12px 0}
+.layer .lh{display:grid;gap:3px}
+.layer .lh b{font-family:var(--display);font-size:1.25rem;font-weight:600;color:var(--ink);line-height:1.1}
+.layer .lh span{font:11px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--border-strong);background:var(--surface);color:var(--text);border-radius:6px;padding:7px 11px;font-size:13.5px;line-height:1.2;display:inline-flex;align-items:center;gap:7px}
+.chip:hover{background:var(--hover)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.sd{width:7px;height:7px;border-radius:50%;flex:none;display:inline-block;background:var(--accent)}
+.sd.inh{background:var(--warn)}
+.sd.plan{background:transparent;border:1.5px solid var(--border-strong)}
+.chip[aria-pressed="true"] .sd{background:var(--on-accent);border-color:var(--on-accent)}
+.between{border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:5px 0 5px 144px;font:11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.between::before{content:"↓";color:var(--accent);margin-right:8px;font-size:13px}
+.st-key{display:inline-flex;align-items:center;gap:4px;flex-wrap:wrap;font:11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.st-key .sd{margin-left:10px;margin-right:2px}
+.stack-detail{border-top:1px solid var(--border);margin:6px -16px 0;padding:14px 16px 16px;background:var(--subtle)}
+.stack-detail .hd{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:8px}
+.stack-detail h4{font-family:var(--display);font-size:1.35rem;font-weight:600;color:var(--ink);margin:0;line-height:1.15}
+.status{font:11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:4px;border:1px solid var(--border-strong);color:var(--text-2);display:inline-flex;gap:6px;align-items:center;background:var(--surface)}
+.status.live{color:var(--accent);border-color:var(--accent);background:var(--accent-subtle)}
+.status.inh{color:var(--warn);border-color:var(--warn);background:var(--warn-bg)}
+.stack-detail p{font-size:14.5px;color:var(--text);margin:0;line-height:1.55}
+.stack-detail p.gap{margin-top:10px;font-size:13.5px;color:var(--text-2)}
+.stack-detail p.gap b{color:var(--text);font-weight:600}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tags span{font:12px/1.4 var(--mono);color:var(--text-2);border:1px solid var(--border);border-radius:4px;padding:2px 7px;background:var(--surface)}
+.steps{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;margin:10px 0 0;padding:0;list-style:none}
+.steps li{position:relative;font:12.5px/1.4 var(--mono);color:var(--text);background:var(--surface);border:1px solid var(--border-strong);border-radius:5px;padding:4px 8px}
+.steps li+li::before{content:"→";position:absolute;left:-15px;top:4px;color:var(--accent)}
+
+/* Figure 5: capacity */
+.cap{padding:14px 16px 0}
+.cap-grid{display:grid;grid-template-columns:repeat(11,minmax(0,1fr));gap:4px;margin-bottom:14px}
+.cap-grid .cell{aspect-ratio:1;max-width:100%;border:1px dashed var(--border-strong);border-radius:4px;display:flex;align-items:center;justify-content:center;font:10px var(--mono);color:var(--muted);min-width:0}
+.cap-grid .cell.on{background:var(--accent);border:1px solid var(--accent);color:var(--on-accent)}
+.cap-grid .cell.beacon{border-radius:50%;font-weight:600}
+.cap-controls{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.cap-controls output{font:600 14px var(--mono);color:var(--text);margin-left:6px}
+
+/* Figure 6: who sees what */
+.wsw{padding:0 0 6px}
+.wsw-grid{display:grid;grid-template-columns:minmax(120px,1.4fr) repeat(6, minmax(58px,1fr));font-size:13px;overflow-x:auto}
+.wsw-wrap{overflow-x:auto}
+.wsw-grid>div{padding:10px 8px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;text-align:center;min-width:0}
+.wsw-grid>div.h{border-top:0;font:11px/1.35 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);align-items:flex-end;padding-top:14px}
+.wsw-grid>div.r{justify-content:flex-start;text-align:left;font-weight:600;color:var(--text);padding-left:16px}
+.dot{width:16px;height:16px;border-radius:50%;border:1.6px solid var(--accent);display:inline-block;flex:none}
+.dot.v2{background:var(--accent)}
+.dot.v1{background:linear-gradient(90deg, var(--accent) 50%, transparent 50%)}
+.dot.v0{border-color:var(--border-strong)}
+.wsw-key{display:flex;gap:18px;flex-wrap:wrap;padding:12px 16px 4px;font-size:13px;color:var(--text-2);align-items:center}
+.wsw-key span{display:inline-flex;align-items:center;gap:8px}
+.wsw-note{padding:10px 16px 12px;font-size:13.5px;color:var(--text-2);line-height:1.55}
+.wsw-note b{color:var(--text)}
+.wsw-grid>div[title]{cursor:help}
+
+/* Figure 4: params */
+.params{width:100%;border-collapse:collapse;font-size:14px}
+.params td{padding:9px 16px;border-top:1px solid var(--border)}
+.params tr:first-child td{border-top:0}
+.params th{font:11px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:500;text-align:right;padding:13px 16px 9px;white-space:nowrap}
+.params th:first-child{text-align:left}
+.params td:first-child{color:var(--text-2);white-space:nowrap}
+.params td:not(:first-child){font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;font-size:13.5px}
+.params td:nth-child(2){color:var(--text-2)}
+.params td:nth-child(3){color:var(--text)}
+
+/* Figure 8: phases */
+.phases{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-bottom:1px solid var(--border)}
+.phases button{border:0;background:none;text-align:left;padding:14px 14px 12px;color:var(--text-2);display:grid;gap:4px;border-right:1px solid var(--border);min-width:0}
+.phases button:last-child{border-right:0}
+.phases button span{font:11px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.phases button strong{font-family:var(--display);font-size:1.15rem;color:var(--ink);font-weight:600;line-height:1.2}
+.phases button:hover{background:var(--hover)}
+.phases button[aria-pressed="true"]{background:var(--accent-subtle);box-shadow:inset 0 -2px 0 var(--accent)}
+.phases button[aria-pressed="true"] span{color:var(--accent)}
+.phase-panel{padding:16px}
+.phase-panel p{font-size:15px;color:var(--text-2)}
+.phase-panel dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:14px 0 0}
+.phase-panel dt{font:11px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.phase-panel dd{margin:0;font-size:14px;color:var(--text)}
+
+/* Three ways to earn */
+.ways{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0}
+.ways article{border:1px solid var(--border);border-radius:8px;background:var(--surface);padding:14px 16px;min-width:0;display:flex;flex-direction:column;gap:6px}
+.ways article .sw{width:14px;height:14px}
+.ways h4{font-family:var(--display);font-size:1.3rem;font-weight:600;color:var(--ink);margin:4px 0 2px;line-height:1.15;text-wrap:balance}
+.ways p{font-size:14.5px;color:var(--text-2);margin:0}
+.paper .ways p+p{margin-top:0}
+.ways .motto{color:var(--accent);font-weight:600}
+.ways .get{color:var(--text)}
+.ways .how{font:12.5px/1.5 var(--mono);color:var(--accent);margin-top:auto;padding-top:6px}
+.nofourth{margin:14px 0 0;padding:12px 16px;border-left:2px solid var(--accent);font-family:var(--display);font-size:1.3rem;line-height:1.3;color:var(--ink);font-weight:500}
+
+/* Figure 7: issuance */
+.iss{padding:14px 16px 0}
+.split{display:flex;gap:2px;height:30px;border-radius:6px;overflow:hidden}
+.split .sg{min-width:0}
+.sw{width:12px;height:12px;border-radius:3px;display:inline-block;flex:none}
+.sw.ico,.sg.ico{background:repeating-linear-gradient(135deg, var(--c-ico) 0 2px, transparent 2px 6px);box-shadow:inset 0 0 0 1px var(--c-ico)}
+.sw.val,.sg.val{background:var(--c-val)}
+.sw.lp,.sg.lp{background:var(--c-lp)}
+.sw.dao,.sg.dao{background:var(--c-dao)}
+.iss-legend{display:flex;gap:10px 22px;flex-wrap:wrap;margin:10px 0 16px;font-size:13.5px;color:var(--text-2)}
+.iss-legend span{display:inline-flex;align-items:center;gap:8px}
+.iss-legend b{color:var(--text);font-weight:600}
+.iss-controls{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;margin-bottom:6px;font-size:13.5px;color:var(--text-2)}
+.iss-controls output{font:600 14px var(--mono);color:var(--text);margin-left:4px}
+.iss-controls input[type="range"]{width:100%;accent-color:var(--accent);margin:0}
+.iss-chart svg{width:100%;height:auto;display:block;touch-action:pan-y;cursor:crosshair}
+.iss-chart .grid{stroke:var(--border);stroke-width:1}
+.iss-chart .axis{fill:var(--muted);font:11px var(--mono)}
+.iss-chart .area{stroke:var(--surface);stroke-width:2;stroke-linejoin:round}
+.iss-chart .lbl{fill:var(--text-2);font:12px var(--body)}
+.iss-chart .marker line{stroke:var(--text-2);stroke-width:1;stroke-dasharray:3 3}
+.iss-chart .marker circle{stroke:var(--surface);stroke-width:2}
+.iss-read{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:10px 0 10px}
+.iss-read>div{border:1px solid var(--border);border-radius:7px;padding:10px 12px;min-width:0}
+.iss-read .k{display:flex;align-items:center;gap:7px;font:11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.iss-read .k .sw{width:9px;height:9px;border-radius:2px}
+.iss-read .v{font:600 17px/1.25 var(--mono);color:var(--text);font-variant-numeric:tabular-nums;margin-top:4px}
+.iss-read .v small{display:block;font:12px/1.5 var(--mono);color:var(--muted);font-weight:400}
+.iss-line{font-size:14px;color:var(--text-2);padding:10px 0 12px;border-top:1px solid var(--border);line-height:1.55}
+.paper p.iss-line{margin:0}
+.iss-line b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
+.iss-table{border-top:1px solid var(--border);margin:0 -16px;padding:0 16px}
+.iss-table summary{padding:11px 0;cursor:pointer;font-size:13.5px;color:var(--text-2)}
+.iss-table-wrap{overflow-x:auto}
+.iss-table table{width:100%;border-collapse:collapse;font:13px var(--mono);font-variant-numeric:tabular-nums;margin-bottom:12px}
+.iss-table th,.iss-table td{padding:6px 8px;text-align:right;border-top:1px solid var(--border);white-space:nowrap}
+.iss-table th{color:var(--muted);font-weight:500;border-top:0}
+.iss-table th:first-child,.iss-table td:first-child{text-align:left}
+
+/* Not-list */
+ul.not{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:8px}
+ul.not li{padding:10px 14px 10px 36px;position:relative;border:1px solid var(--border);border-radius:7px;background:var(--surface);font-size:15.5px}
+ul.not li::before{content:"";position:absolute;left:14px;top:17px;width:12px;height:12px;border-radius:50%;border:1.6px solid var(--border-strong)}
+ul.not li b{font-weight:600}
+ol.limits{padding-left:1.3em;margin:14px 0 0}
+ol.limits li{margin:10px 0;color:var(--text-2)}
+ol.limits li b{color:var(--text);font-weight:600}
+
+/* References & footer */
+ol.refs{padding-left:0;list-style:none;margin:14px 0 0;counter-reset:ref}
+ol.refs li{counter-increment:ref;display:grid;grid-template-columns:34px 1fr;gap:6px;font-size:14.5px;color:var(--text-2);margin:8px 0}
+ol.refs li::before{content:"[" counter(ref) "]";font-family:var(--mono);font-size:13px;color:var(--muted)}
+ol.refs li a{word-break:break-all}
+.endnote{margin-top:52px;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.endnote .lockup{font-size:15px}
+.endnote .lockup svg{width:22px;height:22px}
+sup.ref{font-size:.7em;line-height:0}
+sup.ref a{text-decoration:none;color:var(--accent)}
+
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr;gap:0}
+  .toc{display:none}
+  .toc-mobile{display:block;margin-top:24px;border:1px solid var(--border);border-radius:8px;background:var(--surface)}
+  .toc-mobile summary{padding:12px 14px;cursor:pointer;font-size:14px;color:var(--text-2)}
+  .toc-mobile ol{list-style:none;margin:0;padding:4px 8px 10px;display:grid;gap:2px}
+  .toc-mobile a{display:grid;grid-template-columns:28px 1fr;gap:6px;color:var(--text-2);text-decoration:none;font-size:14px;padding:7px 8px;border-radius:5px}
+  .toc-mobile a .n{font:12px/1.6 var(--mono);color:var(--muted)}
+  .paper{padding-top:28px;max-width:100%}
+  body{font-size:16px}
+  .fees{grid-template-columns:1fr}
+  .fees>div+div{border-left:0;border-top:1px solid var(--border)}
+  .phases{grid-template-columns:1fr 1fr}
+  .phases button:nth-child(2){border-right:0}
+  .phases button:nth-child(1),.phases button:nth-child(2){border-bottom:1px solid var(--border)}
+  .phase-panel dl{grid-template-columns:1fr}
+  .wsw-grid{min-width:560px}
+  .thesis p{font-size:1.3rem}
+  .iss-read{grid-template-columns:1fr 1fr}
+  .ways{grid-template-columns:1fr}
+  .layer{grid-template-columns:1fr;gap:8px}
+  .cap-controls{grid-template-columns:1fr}
+  .cap-grid{gap:3px}
+  .between{padding-left:0}
+  .iss-legend{gap:8px 16px}
+}
+</style>
+
+<a class="skip" href="#abstract">Skip to the paper</a>
+
+<header class="masthead">
+  <div class="in">
+    <a class="lockup" href="https://developers.zephyrium.ai" aria-label="Zephyrium developer documentation">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4V28M4 16H28M7.514719 7.514719L24.485281 24.485281M24.485281 7.514719L7.514719 24.485281" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <span>zephyrium</span>
+    </a>
+    <div class="status">
+      <span class="tag">Whitepaper · draft v0.3</span>
+      <span class="tag">November 2026</span>
+      <span class="tag live">Devnet · pre-audit</span>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="toc" aria-label="Contents">
+    <ol>
+      <li><a href="#abstract" data-toc><span class="n">§</span><span>Abstract</span></a></li>
+      <li><a href="#s1" data-toc><span class="n">1</span><span>Introduction</span></a></li>
+      <li><a href="#s2" data-toc><span class="n">2</span><span>Design properties</span></a></li>
+      <li><a href="#s3" data-toc><span class="n">3</span><span>Identity and finance</span></a></li>
+      <li><a href="#s4" data-toc><span class="n">4</span><span>The connector model</span></a></li>
+      <li><a href="#s5" data-toc><span class="n">5</span><span>Network architecture</span></a></li>
+      <li><a href="#s6" data-toc><span class="n">6</span><span>User-side primitives</span></a></li>
+      <li><a href="#s7" data-toc><span class="n">7</span><span>Disclosure model</span></a></li>
+      <li><a href="#s8" data-toc><span class="n">8</span><span>Economics</span></a></li>
+      <li><a href="#s9" data-toc><span class="n">9</span><span>Deployment</span></a></li>
+      <li><a href="#s10" data-toc><span class="n">10</span><span>Conclusion</span></a></li>
+      <li><a href="#refs" data-toc><span class="n">¶</span><span>References</span></a></li>
+    </ol>
+  </nav>
+
+  <main class="paper" id="top">
+    <details class="toc-mobile">
+      <summary>Contents</summary>
+      <ol>
+        <li><a href="#abstract"><span class="n">§</span><span>Abstract</span></a></li>
+        <li><a href="#s1"><span class="n">1</span><span>Introduction</span></a></li>
+        <li><a href="#s2"><span class="n">2</span><span>Design properties</span></a></li>
+        <li><a href="#s3"><span class="n">3</span><span>Identity and finance</span></a></li>
+        <li><a href="#s4"><span class="n">4</span><span>The connector model</span></a></li>
+        <li><a href="#s5"><span class="n">5</span><span>Network architecture</span></a></li>
+        <li><a href="#s6"><span class="n">6</span><span>User-side primitives</span></a></li>
+        <li><a href="#s7"><span class="n">7</span><span>Disclosure model</span></a></li>
+        <li><a href="#s8"><span class="n">8</span><span>Economics</span></a></li>
+        <li><a href="#s9"><span class="n">9</span><span>Deployment</span></a></li>
+        <li><a href="#s10"><span class="n">10</span><span>Conclusion</span></a></li>
+        <li><a href="#refs"><span class="n">¶</span><span>References</span></a></li>
+      </ol>
+    </details>
+
+    <header class="titleblock">
+      <div class="eyebrow">Whitepaper</div>
+      <h1>ZEP: A Self-Sovereign Neobank</h1>
+      <p class="authors">The Zephyrium contributors<br>
+        <a href="https://developers.zephyrium.ai">developers.zephyrium.ai</a> · <a href="https://explorer.zephyrium.ai">explorer.zephyrium.ai</a></p>
+    </header>
+
+    <section id="abstract" class="abstract" aria-label="Abstract">
+      <p><b>Abstract.</b> This paper specifies ZEP, a self-sovereign financial client built on the Zephyrium network. Conventional and digital banks provide coordination through custody: the institution holds the asset, maintains the ledger, establishes the customer's identity and authorises each movement of funds. We describe an alternative in which these functions are separated and performed by cryptographic keys held by the user, by a sharded proof-of-stake ledger with private transactions, and by an on-chain exchange and bridge. The client performs none of the custodial functions. It constructs and signs transactions locally and connects to the network through a public interface, so that its removal entails no loss of assets. We state six user-level properties with decision tests, describe the network architecture at its current and designed scale, specify the issuance schedule, and show that the native coin can be acquired through exactly three forms of contribution: validation, liquidity provision, and growth or research funded by the DAO. Identity is treated as a second application of the same primitives and is scheduled after the financial layer.</p>
+    </section>
+
+    <section id="s1">
+      <h2><span class="n">1.</span>Introduction</h2>
+      <p>Financial services on the internet rely almost exclusively on institutions acting as trusted third parties. The arrangement is adequate for most transactions but inherits the structural weaknesses of the trust-based model. An account is not a possession; it is a liability of the institution, honoured at its discretion. Each transfer requires authorisation. Each balance is visible to the institution, to its service providers, and to any party able to compel disclosure. Access is granted on the basis of jurisdiction and documentation and may be withdrawn on the same basis.</p>
+      <p>The digital bank, or neobank, removed the branch and retained the remainder: custody, licensing and the authority to freeze. It is an improved interface to an unchanged arrangement.</p>
+      <p>Open networks removed the need for a custodian. They did not remove the need for a front end, and most front ends constructed so far have reintroduced custody, because custody is the simplest means of reducing complexity for the user.</p>
+      <p>We propose a front end that holds nothing on the user's behalf. Custody is exercised by keys under the user's control; settlement is performed by a network that no single party can halt; confidentiality is provided by cryptography rather than by policy; and disclosure occurs at the user's election rather than by institutional default. This paper describes such a client, ZEP, and the network to which it connects, Zephyrium.</p>
+    </section>
+
+    <section id="s2">
+      <h2><span class="n">2.</span>Design properties</h2>
+      <p>We define six properties that a self-sovereign financial system must satisfy. Each is stated with a decision test that can be applied to any product, including the one described here. A product that fails the test does not provide the property.</p>
+      <dl class="freedoms">
+        <div><dt>P1. Custody</dt><dd>No party other than the key holder can move or freeze the holder's assets.<span class="t">Test: can the operator move the funds without the holder? If so, the holder does not have custody.</span></dd></div>
+        <div><dt>P2. Transfer</dt><dd>Value can be sent to any recipient at any time without prior authorisation.<span class="t">Test: which party can refuse a transfer, and on what grounds?</span></dd></div>
+        <div><dt>P3. Non-observability</dt><dd>Balances and counterparties are neither public records nor operator data.<span class="t">Test: what does an unrelated observer learn from the ledger alone?</span></dd></div>
+        <div><dt>P4. Selective disclosure</dt><dd>The holder can prove a chosen fact to a chosen party without revealing other facts.<span class="t">Test: can a single payment be proved without disclosing the holder's history?</span></dd></div>
+        <div><dt>P5. Exit</dt><dd>The holder can leave for another client or another chain with all assets and without loss of function.<span class="t">Test: if the product ceases to exist, what does the holder lose?</span></dd></div>
+        <div><dt>P6. Verifiability</dt><dd>Any party can run a node, read the code and audit the supply.<span class="t">Test: must the holder trust, or can the holder verify?</span></dd></div>
+      </dl>
+      <p style="margin-top:18px">Physical cash satisfies P1, P2, P3 and P5. Networked finance lost these properties when the ledger became the operator's product and the user its subject. The system described here restores them by removing the ledger from any party's ownership.</p>
+    </section>
+
+    <section id="s3">
+      <h2><span class="n">3.</span>Identity and finance as one primitive</h2>
+      <p>Each property above reduces to two questions: who the holder is, and what the holder has. In the trust-based model one institution answers both and its answer is authoritative. In a self-sovereign model the holder answers both and the network verifies the proof.</p>
+      <p>The two answers share one construction: a key controlled by the holder, a statement produced by the holder, and a verifier that learns nothing beyond the statement. A private payment and a private credential are the same construction applied to different predicates. A system that implements one correctly already contains most of what the other requires.</p>
+      <p>Both will be built. Finance is implemented first for three reasons. It has the least ambiguous success criterion: value either settles or it does not. It has the highest cost of failure: frozen funds, surveilled savings, denied access. And it funds the remainder: a network that settles value can compensate the parties that secure it, which an identity layer alone cannot. Identity enters the plan once the financial layer is in production, as an optional layer that allows a holder to prove eligibility without surrendering a dossier.</p>
+    </section>
+
+    <section id="s4">
+      <h2><span class="n">4.</span>The connector model</h2>
+      <p>A bank performs seven functions. Figure 1 lists each function with the party that performs it when the same user operates through ZEP.</p>
+
+      <figure class="wide" id="fig1">
+        <div class="fig-head"><span class="eyebrow">Figure 1 · The seven functions of a bank</span></div>
+        <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th scope="col">Job</th><th scope="col">A bank</th><th scope="col">ZEP on Zephyrium</th></tr></thead>
+          <tbody>
+            <tr><td>Custody</td><td class="bank">Holds your asset on its balance sheet. You hold a claim.</td><td class="zep"><b>Your keys</b> hold it. ZEP never has them and has no server that could.</td></tr>
+            <tr><td>Ledger</td><td class="bank">A private database the bank writes and you may view.</td><td class="zep"><b>Zephyrium</b>: a public chain with private entries, kept by validators you can join.</td></tr>
+            <tr><td>Identity</td><td class="bank">A file about you, built once, consulted on every action.</td><td class="zep"><b>You</b>, producing a proof only when a service needs one.</td></tr>
+            <tr><td>Payments</td><td class="bank">Permissioned, batched, cleared on business days.</td><td class="zep"><b>The network</b>: any hour, no permission, blocks every 10 seconds.</td></tr>
+            <tr><td>Markets</td><td class="bank">The bank's desk, at the bank's spread.</td><td class="zep"><b>SWAP</b>: pools on the chain itself, with a fee you can read in advance.</td></tr>
+            <tr><td>Credit</td><td class="bank">Lent from deposits against the bank's balance sheet.</td><td class="zep"><b>Not in scope</b> at this stage. ZEP has no deposits to lend.</td></tr>
+            <tr><td>Compliance</td><td class="bank">Reports about you, filed without you.</td><td class="zep"><b>You</b>, disclosing selectively to the party that requires it.</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <figcaption><b>Observation.</b> In every row the right-hand column names a party other than the client. The connector performs none of the seven functions itself.</figcaption>
+      </figure>
+
+      <p>We define a <em>connector</em> as a client that (i) holds no user key material on any server, (ii) maintains no ledger, (iii) issues no claims on its own balance sheet, and (iv) can be replaced by any other conforming client without loss of assets or function. ZEP satisfies this definition: it holds no deposits, keeps no ledger, extends no credit and cannot freeze an account, because no account exists. Its function is connection: a key to a chain, a holder to a market, a statement to a verifier. Figure 2 shows the model and the consequence of removing the connector.</p>
+
+      <figure class="wide" id="fig2">
+        <div class="fig-head">
+          <span class="eyebrow">Figure 2 · The connector model</span>
+          <button class="btn" id="goneBtn" type="button" aria-pressed="false">What if ZEP disappears?</button>
+        </div>
+        <div class="connector" id="connector">
+          <svg viewBox="0 0 760 330" role="group" aria-label="Diagram: a person with keys connects through ZEP to the Zephyrium network: validators, a private ledger, SWAP markets and a bridge to Ethereum. Without ZEP the same keys reach the same network directly.">
+            <!-- via ZEP -->
+            <line class="wire via" x1="136" y1="165" x2="246" y2="165"/>
+            <line class="wire via" x1="278" y1="165" x2="410" y2="80"/>
+            <line class="wire via" x1="278" y1="165" x2="410" y2="140"/>
+            <line class="wire via" x1="278" y1="165" x2="410" y2="200"/>
+            <line class="wire via" x1="278" y1="165" x2="410" y2="260"/>
+            <!-- direct, shown when ZEP is gone -->
+            <path class="wire direct" d="M136 165 C 240 165, 300 80, 410 80"/>
+            <path class="wire direct" d="M136 165 C 240 165, 300 140, 410 140"/>
+            <path class="wire direct" d="M136 165 C 240 165, 300 200, 410 200"/>
+            <path class="wire direct" d="M136 165 C 240 165, 300 260, 410 260"/>
+            <!-- bridge to ethereum -->
+            <line class="wire via" x1="590" y1="260" x2="660" y2="260" style="opacity:1"/>
+
+            <text class="lbl" x="92" y="98" text-anchor="middle">Person</text>
+            <g class="node you" data-k="you" tabindex="0" role="button" aria-label="You and your keys">
+              <circle class="box" cx="92" cy="165" r="44"/>
+              <text x="92" y="161" text-anchor="middle" font-weight="600">You</text>
+              <text class="small" x="92" y="178" text-anchor="middle">your keys</text>
+            </g>
+
+            <text class="lbl" x="262" y="98" text-anchor="middle">Connector</text>
+            <g class="node zep" data-k="zep" tabindex="0" role="button" aria-label="ZEP, the connector">
+              <rect class="box" x="246" y="110" width="32" height="110" rx="7"/>
+              <text x="262" y="170" text-anchor="middle" transform="rotate(-90 262 170)">ZEP</text>
+            </g>
+
+            <text class="lbl" x="500" y="40" text-anchor="middle">Zephyrium network</text>
+            <rect class="group" x="392" y="52" width="216" height="240" rx="12"/>
+            <g class="node" data-k="val" tabindex="0" role="button" aria-label="Validators">
+              <rect class="box" x="410" y="60" width="180" height="40" rx="7"/>
+              <text x="500" y="85" text-anchor="middle">Validators</text>
+            </g>
+            <g class="node" data-k="ledger" tabindex="0" role="button" aria-label="Private ledger">
+              <rect class="box" x="410" y="120" width="180" height="40" rx="7"/>
+              <text x="500" y="145" text-anchor="middle">Private ledger</text>
+            </g>
+            <g class="node" data-k="dex" tabindex="0" role="button" aria-label="SWAP markets">
+              <rect class="box" x="410" y="180" width="180" height="40" rx="7"/>
+              <text x="500" y="205" text-anchor="middle">SWAP markets</text>
+            </g>
+            <g class="node" data-k="bridge" tabindex="0" role="button" aria-label="Bridge">
+              <rect class="box" x="410" y="240" width="180" height="40" rx="7"/>
+              <text x="500" y="265" text-anchor="middle">Bridge</text>
+            </g>
+
+            <text class="lbl" x="705" y="222" text-anchor="middle">Other chains</text>
+            <g class="node eth" data-k="eth" tabindex="0" role="button" aria-label="Ethereum">
+              <rect class="box" x="660" y="240" width="90" height="40" rx="7"/>
+              <text x="705" y="265" text-anchor="middle">Ethereum</text>
+            </g>
+          </svg>
+          <div class="legend">
+            <p id="connectorText"><b>Select any element.</b> Lines are connections, not custody. Nothing on the right holds anything for the person on the left: the keys stay with the person, and the ledger belongs to no one.</p>
+          </div>
+        </div>
+        <figcaption><b>Substitutability.</b> Removing the connector leaves the key holder connected to the same network through any other client. This is the exit property of Section 2: the loss on removal is limited to convenience.</figcaption>
+      </figure>
+
+      <p>The term neobank is retained because it describes the function the user seeks: a modern interface to money. It does not describe the structure, and the structure is the contribution of this design.</p>
+      <div class="thesis"><p>A neobank in this model is not a bank. It is a connector to an open settlement network that exists independently of it and requires no permission to use.</p></div>
+    </section>
+
+    <section id="s5">
+      <h2><span class="n">5.</span>Network architecture</h2>
+      <p>Zephyrium is a proof-of-stake network with confidentiality implemented at the transaction level. Its native coin, ZEP, pays fees and secures the chain. The codebase descends from Incognito Chain<sup class="ref"><a href="#refs">[5]</a></sup> with new economic parameters, new key material and a scheduled replacement of several inherited components.</p>
+      <p>Figure 3 presents the system in three layers. The application layer holds key material and constructs transactions. The infrastructure layer transports them. The chain layer settles them under BLS-BFT consensus: one beacon committee and one committee per shard, a rotating proposer, votes aggregated into a single BLS multi-signature, and finality once more than two thirds of the committee have signed. Blocks are produced at 10-second intervals; committees are re-drawn from the staked pool at each epoch. Each component in the figure is annotated with its function, its underlying primitive and its implementation status.</p>
+
+      <figure class="wide" id="fig3">
+        <div class="fig-head">
+          <span class="eyebrow">Figure 3 · System layers</span>
+          <span class="st-key"><i class="sd"></i>live<i class="sd inh"></i>inherited, to replace<i class="sd plan"></i>planned</span>
+        </div>
+        <div class="stack" id="stack">
+          <div class="layer" data-layer="app"><div class="lh"><b>Application</b><span>ZEP · the neobank</span></div><div class="chips" role="group" aria-label="Application layer parts"></div></div>
+          <div class="between">signed transactions · RPC queries</div>
+          <div class="layer" data-layer="infra"><div class="lh"><b>Infrastructure</b><span>nodes · network · bridge</span></div><div class="chips" role="group" aria-label="Infrastructure layer parts"></div></div>
+          <div class="between">blocks · gossip · bridge instructions</div>
+          <div class="layer" data-layer="chain"><div class="lh"><b>Chain</b><span>Zephyrium · settlement</span></div><div class="chips" role="group" aria-label="Chain layer parts"></div></div>
+          <div class="stack-detail" id="stackDetail" aria-live="polite"></div>
+        </div>
+        <figcaption><b>Trust boundary.</b> Key material and proofs are produced in the application layer and only verified below it. No component of the infrastructure layer can spend, and no component of the chain layer can identify. Status marks refer to the current development network.</figcaption>
+      </figure>
+
+      <p>The network is sharded. One beacon chain coordinates up to 32 shard chains, each with its own committee of up to 32 validators; the shard count is fixed at network creation. The development network operates one shard. Figure 4 lists the parameters as deployed beside the configuration the code is designed for; Figure 5 expresses the designed configuration in validator seats, stake and throughput. Each shard confirms a 2 MB block every 10 seconds, so capacity scales linearly with the shard count. Cross-shard transfers are routed through the beacon, which is therefore the component that must scale with it.</p>
+
+      <figure class="wide" id="fig4">
+        <div class="fig-head"><span class="eyebrow">Figure 4 · Network parameters</span><span class="eyebrow">running now · designed for</span></div>
+        <div class="tbl-wrap">
+        <table class="params">
+          <thead><tr><th scope="col">Parameter</th><th scope="col">Devnet now</th><th scope="col">Designed for</th></tr></thead>
+          <tbody>
+            <tr><td>Shards</td><td>1 + beacon</td><td>up to 32 + beacon</td></tr>
+            <tr><td>Shard committee</td><td>5 to 7 seats, 5 fixed</td><td>up to 32 seats, none fixed</td></tr>
+            <tr><td>Beacon committee</td><td>4 seats, all fixed</td><td>up to 32 seats, none fixed</td></tr>
+            <tr><td>Block interval</td><td>10 s</td><td>10 s</td></tr>
+            <tr><td>Block size</td><td>2 MB per shard block</td><td>2 MB per shard block</td></tr>
+            <tr><td>Epoch</td><td>50 beacon blocks</td><td>set at launch</td></tr>
+            <tr><td>Validator stake, shard</td><td>21,000 ZEP</td><td>21,000 ZEP</td></tr>
+            <tr><td>Validator stake, beacon minimum</td><td>210,000 ZEP</td><td>210,000 ZEP</td></tr>
+            <tr><td>Maximum supply</td><td>1,000,000,000 ZEP</td><td>1,000,000,000 ZEP</td></tr>
+            <tr><td>Created at genesis, the ICO</td><td>71,000,000 ZEP</td><td>31,000,000 ZEP · 3.1 %</td></tr>
+            <tr><td>Minted by blocks, total</td><td>929,000,000 ZEP</td><td>969,000,000 ZEP · 96.9 %</td></tr>
+            <tr><td>Split of every block</td><td>299 / 929 validators · 630 / 929 foundation</td><td>⅓ validators · ⅓ liquidity · ⅓ DAO</td></tr>
+            <tr><td>Issuance curve</td><td>-10 % per year, 21 years</td><td>-10 % per year, 21 years</td></tr>
+            <tr><td>Smallest unit</td><td>10⁻⁹ ZEP</td><td>10⁻⁹ ZEP</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <figcaption><b>Two configurations of one codebase.</b> The left column is the development network as deployed. The right column is the configuration the inherited design supports with its limits raised; the upstream network operated 8 shards with 32-seat committees and 2 MB blocks on the same code. Consensus parameters are fixed at network creation.</figcaption>
+      </figure>
+
+      <figure class="wide" id="fig5">
+        <div class="fig-head"><span class="eyebrow">Figure 5 · Capacity at the design ceiling</span><span class="eyebrow">derived, not measured</span></div>
+        <div class="cap">
+          <div class="cap-grid" id="capGrid" role="img" aria-label="One beacon and up to 32 shards; the lit cells are the shards in the selected configuration."></div>
+          <div class="cap-controls">
+            <div class="field"><label for="shards">Shards<output id="shardsOut" for="shards">32</output></label><input type="range" id="shards" min="1" max="32" step="1" value="32"></div>
+            <div class="field"><label for="txkb">Size of an ordinary private transfer, KB</label><input type="number" id="txkb" min="0.5" max="10" step="0.1" value="2" inputmode="decimal"></div>
+          </div>
+          <div class="iss-read" id="capRead"></div>
+          <p class="iss-line" id="capLine"></p>
+        </div>
+        <figcaption><b>Analytical bound, not a benchmark.</b> Throughput is computed as block size divided by block interval and transaction size, per shard, multiplied by the shard count. A private transfer with one input and two outputs occupies approximately 2 KB; the estimate is adjustable. The beacon processes every cross-shard transfer and bridge instruction and is therefore the binding component at scale.</figcaption>
+      </figure>
+
+      <p><b>Confidential transactions.</b> The ledger is public; its entries are not. Outputs are addressed to one-time addresses, so no two payments to a recipient share an address. Amounts are Pedersen commitments, allowing validators to verify that inputs equal outputs without learning the values. The spent input is concealed within a ring of decoys by an MLSAG signature; a serial number per input prevents double-spending. Validators verify validity, not identity.</p>
+      <p><b>Bridged assets.</b> Any asset on Ethereum can enter the network. A vault contract on Ethereum locks the asset; after 15 confirmations the beacon issues an equal quantity of a private token that is transferred under the same rules as ZEP; burning the token releases the original. Both directions have been exercised on the Sepolia test network.</p>
+      <p><b>Native exchange.</b> Markets are implemented on-chain. Constant-product pools are quoted in ZEP, so any pair routes through the native coin and a swap is a single transaction on the same ledger as the holding. No order-book operator and no external venue is required.</p>
+    </section>
+
+    <section id="s6">
+      <h2><span class="n">6.</span>User-side primitives</h2>
+      <p>The client exposes the following primitives. Each exists on the network independently of the client; the client's role is to make them operable from one interface.</p>
+      <dl class="tools">
+        <dt>Keys</dt>
+        <dd>A spending key is generated on the user's device and never transmitted. The client has no account system and no server-side recovery. Backup and recovery are the user's responsibility; the client provides backup tooling but no custody.</dd>
+        <dt>Private transfers</dt>
+        <dd>ZEP or any bridged asset is transferred with amount, sender and recipient concealed from all parties except the two participants. Validators verify validity without learning content.</dd>
+        <dt>Private assets</dt>
+        <dd>Stablecoins, ETH and other Ethereum assets are shielded through the bridge and held in private form. They behave as ZEP within the network and are redeemable on Ethereum at the holder's election.</dd>
+        <dt>Native swaps</dt>
+        <dd>Assets are exchanged in a single on-chain transaction through ZEP-quoted pools. The fee is fixed per route and known before signing; liquidity is owned by the providers that supplied it.</dd>
+        <dt>Selective disclosure</dt>
+        <dd>A viewing key grants one chosen party read-only access to the holder's incoming coins; a per-payment proof discloses a single transfer. Zero-knowledge statements over predicates such as age, eligibility or a balance threshold are the planned identity layer.</dd>
+        <dt>Exit</dt>
+        <dd>Any conforming wallet reads the same chain. The bridge returns assets to Ethereum. The RPC interface is public. No component of the client is required in order to leave it.</dd>
+      </dl>
+    </section>
+
+    <section id="s7">
+      <h2><span class="n">7.</span>Disclosure model</h2>
+      <p>Confidentiality is specified as a matrix of parties and facts. Figure 6 compares three models: a bank account, a public blockchain, and ZEP on Zephyrium. Each cell records what a party can learn from the system itself, without being informed by the user.</p>
+
+      <figure class="wide" id="fig6">
+        <div class="fig-head">
+          <span class="eyebrow">Figure 6 · Disclosure model</span>
+          <div class="seg" role="group" aria-label="Choose a model">
+            <button type="button" data-model="bank" aria-pressed="false">Bank account</button>
+            <button type="button" data-model="chain" aria-pressed="false">Public blockchain</button>
+            <button type="button" data-model="zep" aria-pressed="true">ZEP on Zephyrium</button>
+          </div>
+        </div>
+        <div class="wsw">
+          <div class="wsw-wrap"><div class="wsw-grid" id="wswGrid" aria-live="polite"></div></div>
+          <div class="wsw-key">
+            <span><i class="dot v2"></i> Sees it</span>
+            <span><i class="dot v1"></i> Partly, or in some cases</span>
+            <span><i class="dot v0"></i> Hidden</span>
+          </div>
+          <div class="wsw-note" id="wswNote"></div>
+        </div>
+        <figcaption><b>Parties.</b> Operator denotes the bank, the wallet application or the ZEP client. Network denotes card networks and correspondent banks, or the validator set. Compelled authority denotes a party with legal power over the operator or the user. A half mark indicates conditional visibility; the condition is shown on hover.</figcaption>
+      </figure>
+
+      <p>The third model provides confidentiality with respect to the public and to the operator, not with respect to all parties. A payee knows that it was paid. An on-ramp that performed identity verification retains that record. A viewing key given to an auditor discloses exactly what the holder chose to disclose. Residual visibility in the current implementation is recorded in the figure's notes.</p>
+    </section>
+
+    <section id="s8">
+      <h2><span class="n">8.</span>Economics</h2>
+      <p>A connector that holds nothing cannot earn a spread on user funds or monetise user data. ZEP is funded by the network it connects to: one third of every block is minted to the DAO, which finances research, development and growth, including this client. The user pays network fees and pays the client nothing.</p>
+      <p><b>Transaction fee.</b> A private transfer costs 0.01 ZEP regardless of amount, of which 0.008 ZEP is allocated to security and 0.002 ZEP to funding. Fees for exchange and asset registration will be specified in a subsequent revision.</p>
+      <p><b>Returns.</b> Where a return exists, its source is inspectable. Validators and liquidity providers receive their shares of each block on a published, decreasing schedule, together with their shares of fees from actual use. The client pays no interest, since it holds no deposits to lend.</p>
+
+      <h3>Three pillars of the ZEP network</h3>
+      <p>The native coin enters circulation through exactly three forms of verifiable contribution, which we term the pillars of the network. No other issuance path exists: there is no airdrop, referral reward, interest, or allocation to a team or investor beyond the 31,000,000 ZEP sold at genesis.</p>
+      <div class="ways">
+        <article>
+          <span class="sw val" aria-hidden="true"></span>
+          <h4>Validators</h4>
+          <p class="motto">Run the chain and earn ZEP.</p>
+          <p>Stake ZEP, operate a validator and sign blocks.</p>
+          <p class="get">One third of each block reward, plus the security share of fees.</p>
+          <p class="how">Verified by consensus participation, on-chain.</p>
+        </article>
+        <article>
+          <span class="sw lp" aria-hidden="true"></span>
+          <h4>Liquidity providers</h4>
+          <p class="motto">Provide liquidity and earn ZEP.</p>
+          <p>Supply assets to ZEP-quoted pools and keep them available to traders.</p>
+          <p class="get">One third of each block reward, in proportion to liquidity supplied, plus exchange fees.</p>
+          <p class="how">Verified by pool balances, on-chain.</p>
+        </article>
+        <article>
+          <span class="sw dao" aria-hidden="true"></span>
+          <h4>DAO</h4>
+          <p class="motto">Contribute to growth or R&amp;D and earn ZEP.</p>
+          <p>Research, development, audits, integrations and adoption work.</p>
+          <p class="get">One third of each block reward, disbursed by the DAO for delivered work under rules set by ZEP holders.</p>
+          <p class="how">Verified by proposal, deliverable and vote.</p>
+        </article>
+      </div>
+      <p class="nofourth">Closed issuance. Every unit of ZEP in existence is either part of the 31,000,000 created at genesis or part of the minted supply, and the minted supply divides into exactly three equal parts, one per pillar.</p>
+
+      <h3>Issuance</h3>
+      <p>The supply of ZEP is capped at 1,000,000,000. A genesis allocation of 31,000,000 ZEP, 3.1 % of the cap, is created for the initial offering; no other ZEP is pre-minted. The remaining 969,000,000 ZEP are minted block by block over 21 years on a schedule that decreases by 10 % per year and then terminates.</p>
+      <p>Each block divides its newly minted ZEP into three equal parts, one per pillar: one third to the validators that confirmed it, one third to liquidity providers, and one third to the DAO. Since the division is fixed per block and the cap is fixed, the shares of total supply are identical at every height and at termination: 32.3 % validators, 32.3 % liquidity, 32.3 % DAO, 3.1 % genesis. No participant is paid ahead of another, and no participant can receive more than the schedule specifies.</p>
+      <p>Figure 7 plots the schedule. The year selector shows the cumulative amount of each share at that point and the value of a single block.</p>
+
+      <figure class="wide" id="fig7">
+        <div class="fig-head">
+          <span class="eyebrow">Figure 7 · Issuance of 1,000,000,000 ZEP</span>
+          <span class="eyebrow">10 s blocks · −10 % a year · 21 years</span>
+        </div>
+        <div class="iss">
+          <div class="split" role="img" aria-label="Supply split: ICO 3.1 percent created at genesis; validators, liquidity providers and the DAO 32.3 percent each, minted block by block.">
+            <div class="sg ico" style="flex:31 1 0" title="ICO · 3.1 % · created at genesis"></div>
+            <div class="sg val" style="flex:323 1 0" title="Validators · 32.3 % · run the chain"></div>
+            <div class="sg lp" style="flex:323 1 0" title="Liquidity · 32.3 % · provide liquidity"></div>
+            <div class="sg dao" style="flex:323 1 0" title="DAO · 32.3 % · growth and R&amp;D"></div>
+          </div>
+          <div class="iss-legend">
+            <span><i class="sw ico"></i><b>ICO 3.1 %</b> · created at genesis</span>
+            <span><i class="sw val"></i><b>Validators 32.3 %</b> · run the chain</span>
+            <span><i class="sw lp"></i><b>Liquidity 32.3 %</b> · provide liquidity</span>
+            <span><i class="sw dao"></i><b>DAO 32.3 %</b> · build and grow</span>
+          </div>
+          <div class="iss-controls">
+            <label for="yr">Year<output id="yrOut" for="yr">21</output></label>
+            <input type="range" id="yr" min="0" max="21" step="1" value="21">
+          </div>
+          <div class="iss-chart"><svg id="issSvg" viewBox="0 0 720 300" role="img" aria-label="Stacked area chart of cumulative ZEP supply over 21 years by share: ICO, validators, liquidity and DAO. The year-by-year table below carries the same numbers."></svg></div>
+          <div class="iss-read" id="issRead"></div>
+          <p class="iss-line" id="issLine"></p>
+          <details class="iss-table">
+            <summary>Year-by-year schedule</summary>
+            <div class="iss-table-wrap"><table><thead><tr><th>Year</th><th>Block reward, ZEP</th><th>Minted in year</th><th>Cumulative supply</th><th>Of cap</th></tr></thead><tbody id="issTbody"></tbody></table></div>
+          </details>
+        </div>
+        <figcaption><b>Invariance under height.</b> Because the division is applied to every block, minted supply divides into equal thirds at every height, one per pillar; the 3.1 % genesis allocation is the only supply that precedes the first block. Values are derived from the stated curve at 10-second blocks; the per-block constant is a chain parameter.</figcaption>
+      </figure>
+    </section>
+
+    <section id="s9">
+      <h2><span class="n">9.</span>Deployment</h2>
+      <p>Deployment proceeds in the order in which trust can be established: a network that can be relied upon, markets that can be used, a client that users retain, and then the second pillar of identity. Each phase specifies a contribution, a reward with a named source, and a measurable condition for advancing to the next. Figure 8 lists the four phases.</p>
+
+      <figure class="wide" id="fig8">
+        <div class="fig-head"><span class="eyebrow">Figure 8 · Deployment phases</span></div>
+        <div class="phases" role="group" aria-label="Phases">
+          <button type="button" data-phase="p1" aria-pressed="true"><span>Phase 1</span><strong>Secure the network</strong></button>
+          <button type="button" data-phase="p2" aria-pressed="false"><span>Phase 2</span><strong>Make the markets usable</strong></button>
+          <button type="button" data-phase="p3" aria-pressed="false"><span>Phase 3</span><strong>Open ZEP</strong></button>
+          <button type="button" data-phase="p4" aria-pressed="false"><span>Phase 4</span><strong>Identity</strong></button>
+        </div>
+        <div class="phase-panel" id="phasePanel" aria-live="polite"></div>
+        <figcaption><b>Issuance and fees are distinct sources.</b> Issuance-funded rewards bootstrap participation; fees arise from use. A system that functions only while it subsidises activity has not reached its steady state.</figcaption>
+      </figure>
+    </section>
+
+    <section id="s10">
+      <h2><span class="n">10.</span>Conclusion</h2>
+      <p>We have specified a financial client that owns nothing on the user's behalf. Starting from the observation that the weaknesses of the trust-based model are structural, and that the digital bank preserved them by preserving custody, we described a network on which custody is exercised by keys, settlement by validators that any party may join, confidentiality by cryptography and disclosure by election. We then specified the client, which performs none of a bank's seven functions and is substitutable without loss, stated the economics in verifiable terms, and showed that the native coin is issued through three pillars and no other path.</p>
+      <p>The resulting system is one in which the holder holds, the network settles, and the connector only connects. Adoption is expected to follow the pattern of cash rather than that of a platform: one user at a time, on the basis that the system functions and demands nothing in return.</p>
+      <p>Financial self-sovereignty is implemented first. Identity follows on the same primitives.</p>
+    </section>
+
+    <section id="refs">
+      <h2><span class="n">¶</span>References</h2>
+      <ol class="refs">
+        <li><span>S. Nakamoto, "Bitcoin: A Peer-to-Peer Electronic Cash System," 2008. <a href="https://bitcoin.org/bitcoin.pdf">bitcoin.org/bitcoin.pdf</a></span></li>
+        <li><span>N. van Saberhagen, "CryptoNote v2.0," 2013. One-time addresses and ring signatures.</span></li>
+        <li><span>E. Ben-Sasson, A. Chiesa, C. Garman, M. Green, I. Miers, E. Tromer, M. Virza, "Zerocash: Decentralized Anonymous Payments from Bitcoin," IEEE Symposium on Security and Privacy, 2014.</span></li>
+        <li><span>D. Chaum, "Security without Identification: Transaction Systems to Make Big Brother Obsolete," Communications of the ACM 28(10), 1985.</span></li>
+        <li><span>Incognito Chain, source code and documentation, upstream of Zephyrium. <a href="https://github.com/incognitochain/incognito-chain">github.com/incognitochain/incognito-chain</a></span></li>
+        <li><span>Zephyrium developer documentation: network parameters, differences from upstream, Ethereum bridge, roadmap. <a href="https://developers.zephyrium.ai">developers.zephyrium.ai</a></span></li>
+        <li><span>Zephyrium network explorer: blocks, validators, minting split, SWAP pairs. <a href="https://explorer.zephyrium.ai">explorer.zephyrium.ai</a></span></li>
+        <li><span>FATF, "Virtual Assets and Virtual Asset Service Providers," standards and guidance. <a href="https://www.fatf-gafi.org/en/publications/Virtualassets/Virtual-assets-fatf-standards.html">fatf-gafi.org</a></span></li>
+      </ol>
+    </section>
+
+    <footer class="endnote">
+      <a class="lockup" href="#top" aria-label="Back to top">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4V28M4 16H28M7.514719 7.514719L24.485281 24.485281M24.485281 7.514719L7.514719 24.485281" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <span>zephyrium</span>
+      </a>
+      <span>ZEP whitepaper · draft v0.3 · November 2026 · describes intended design, not a live product or a licensed service</span>
+    </footer>
+  </main>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  /* Contents: highlight the section in view */
+  const links = Array.from(document.querySelectorAll('.toc a[data-toc]'));
+  const byId = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+  const sections = Array.from(document.querySelectorAll('main section[id]'));
+  if ('IntersectionObserver' in window && links.length) {
+    let current = null;
+    const io = new IntersectionObserver(entries => {
+      const visible = entries.filter(e => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+      if (!visible.length) return;
+      const id = visible[0].target.id;
+      if (id === current) return;
+      current = id;
+      links.forEach(a => a.removeAttribute('aria-current'));
+      const a = byId.get(id); if (a) a.setAttribute('aria-current', 'true');
+    }, { rootMargin: '-15% 0px -70% 0px', threshold: 0 });
+    sections.forEach(s => io.observe(s));
+  }
+
+  /* Figure 1: connector */
+  const connector = document.getElementById('connector');
+  const goneBtn = document.getElementById('goneBtn');
+  const cText = document.getElementById('connectorText');
+  const info = {
+    you: '<b>You.</b> A key pair generated on your device. It signs every spend and every disclosure. Nothing in this diagram works without it, and nothing in this diagram can act in its place.',
+    zep: '<b>ZEP.</b> The connector. It builds transactions for you to sign, shows you the chain, finds a route through the markets and wraps the bridge. It holds no keys and no funds. Drawn thin because it is.',
+    val: '<b>Validators.</b> Staked operators who order and confirm transactions. They check that a transfer is valid without learning its amount or its parties. Seats are meant to be earned by stake under common rules.',
+    ledger: '<b>Private ledger.</b> A public chain whose entries are hidden: one-time addresses, committed amounts, decoy-mixed spends. Anyone can verify the supply. Nobody can read your balance.',
+    dex: '<b>SWAP markets.</b> Pools quoted in ZEP, on the chain itself. A swap is one transaction with a fee you can read before you sign. Liquidity belongs to whoever supplied it.',
+    bridge: '<b>Bridge.</b> A vault on Ethereum locks an asset; a shielded twin appears here. Burn the twin, and the original is released. Exercised on the Sepolia test network in both directions.',
+    eth: '<b>Ethereum.</b> Where most assets live today. Through the bridge, any of them can be held and moved privately on Zephyrium and returned intact.'
+  };
+  const gone = {
+    you: '<b>You, without ZEP.</b> Same keys, same funds. Open any compatible wallet and everything is where you left it.',
+    zep: '<b>ZEP, switched off.</b> The convenience is gone. Nothing else is. That is the only acceptable failure mode for a connector.',
+    val: '<b>Validators</b> keep confirming blocks. They never knew ZEP existed; they see signed transactions, whoever built them.',
+    ledger: '<b>The ledger</b> is unchanged. Your coins were never in ZEP. They were always here, spendable by your key alone.',
+    dex: '<b>The markets</b> keep quoting. Any client can route a swap through them; ZEP was one of many.',
+    bridge: '<b>The bridge</b> still releases what it locked. Its contract answers to the chain, not to a company.',
+    eth: '<b>Ethereum</b> is exactly where it was.'
+  };
+  let selected = null;
+  function render() {
+    const isGone = connector.classList.contains('gone');
+    if (!selected) {
+      cText.innerHTML = isGone
+        ? '<b>ZEP is gone.</b> The dashed lines are the person’s keys reaching the same network through any other client. Nothing owned has moved, because nothing owned was ever in the connector.'
+        : '<b>Select any element.</b> Lines are connections, not custody. Nothing on the right holds anything for the person on the left: the keys stay with the person, and the ledger belongs to no one.';
+      return;
+    }
+    cText.innerHTML = (isGone ? gone : info)[selected];
+  }
+  connector.querySelectorAll('.node').forEach(n => {
+    const pick = () => {
+      connector.querySelectorAll('.node.on').forEach(x => x.classList.remove('on'));
+      selected = n.dataset.k; n.classList.add('on'); render();
+    };
+    n.addEventListener('click', pick);
+    n.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+  });
+  goneBtn.addEventListener('click', () => {
+    const on = connector.classList.toggle('gone');
+    goneBtn.setAttribute('aria-pressed', String(on));
+    goneBtn.textContent = on ? 'Bring ZEP back' : 'What if ZEP disappears?';
+    render();
+  });
+
+  /* Figure 3: the stack */
+  (() => {
+    const stack = document.getElementById('stack'); if (!stack) return;
+    const parts = [
+      { id: 'client', layer: 'app', name: 'ZEP client', st: 'live', stl: 'Live · browser extension',
+        body: 'Hold, send, swap, shield and disclose through one interface. Runs entirely on the user’s device; there is no account and no server that could hold a key. A provider API lets other applications ask the user to sign.',
+        tags: ['Manifest V3', 'provider API', 'no backend'] },
+      { id: 'keys', layer: 'app', name: 'Keys on device', st: 'live', stl: 'Live',
+        body: 'A 32-byte spending key is generated locally and never transmitted. From it the client derives the payment address (public key, transmission key and one-time-address key), a read-only viewing key, and an OTA key used to recognise incoming coins.',
+        tags: ['edwards25519', 'payment address', 'viewing key', 'OTA key'] },
+      { id: 'prove', layer: 'app', name: 'Local proving and signing', st: 'live', stl: 'Live',
+        body: 'The client builds every transaction itself: selects the inputs, draws 7 decoys for each, commits the amounts, produces the range proof and the ring signature, and submits raw bytes. Nodes verify; they never see a key.',
+        tags: ['Bulletproofs', 'MLSAG', 'ring size 8'],
+        steps: ['select inputs', 'draw 7 decoys', 'commit amounts', 'range proof', 'ring signature', 'serial numbers', 'submit'] },
+      { id: 'disclose', layer: 'app', name: 'Selective disclosure', st: 'live', stl: 'Viewing key live · ZK statements planned',
+        body: 'A viewing key handed to one party gives read-only sight of incoming coins; a per-payment proof shows a single transfer. Zero-knowledge statements that reveal one fact, such as age, eligibility or a balance threshold, are the planned identity layer.',
+        gap: 'Statements are roadmap, not a shipped feature.',
+        tags: ['viewing key', 'payment proof', 'ZK credential (planned)'] },
+
+      { id: 'nodes', layer: 'infra', name: 'Nodes and RPC', st: 'live', stl: 'Live',
+        body: 'Every full node validates the beacon and its shard, keeps the coin set in LevelDB and serves JSON-RPC to wallets, the explorer and the bridge tooling. On request it indexes the coins that belong to an OTA key.',
+        gap: 'Today a wallet gives a node its OTA key to find coins. Scanning without handing over a key is roadmap item 2.',
+        tags: ['JSON-RPC', 'LevelDB', 'coin indexer'] },
+      { id: 'highway', layer: 'infra', name: 'Highway relay', st: 'inh', stl: 'Inherited · to replace',
+        body: 'Nodes discover each other and gossip blocks and transactions through a libp2p relay bundled with the node. It works, and it can see which node a transaction came from.',
+        gap: 'Direct peer-to-peer gossip that hides the origin replaces it: roadmap item 3 and a precondition for a public testnet.',
+        tags: ['libp2p', 'pubsub', 'gRPC'] },
+      { id: 'bridge', layer: 'infra', name: 'Ethereum bridge', st: 'live', stl: 'Live on Sepolia · audit pending',
+        body: 'A Vault contract locks ETH or an ERC-20. After 15 confirmations the beacon mints the matching pToken from the deposit receipt proof. Burning the pToken makes the beacon emit a confirmation signed with its bridge keys; the IncognitoProxy contract checks that more than two thirds signed, and the Vault pays out.',
+        gap: 'Validators trust the Ethereum RPC they are configured with, and the registry admin can pause the bridge for one year after deployment.',
+        tags: ['Vault, upgradeable proxy', 'IncognitoProxy', 'ECDSA bridge keys', '15 confirmations'],
+        steps: ['deposit on Ethereum', '15 confirmations', 'receipt proof', 'beacon mints pToken', 'burn on Zephyrium', 'beacon signs', 'Vault withdraw'] },
+      { id: 'tools', layer: 'infra', name: 'Explorer, SDK, CLI', st: 'live', stl: 'Live',
+        body: 'The explorer reads blocks, validators, the minting split and SWAP pairs over RPC. A command-line tool drives shielding, burning and burn proofs. A wallet SDK wraps the same calls for other clients.',
+        tags: ['explorer.zephyrium.ai', 'zepbridge CLI', 'wallet SDK'] },
+
+      { id: 'consensus', layer: 'chain', name: 'BLS-BFT consensus', st: 'live', stl: 'Live · v2',
+        body: 'Each committee has a rotating proposer. Members vote on the proposed block and the votes aggregate into one BLS multi-signature on the bn256 pairing curve. A block is final once more than two thirds of the committee have signed it. Blocks every 10 seconds; a byzantine detector records double proposals and double votes.',
+        gap: 'Committee randomness a proposer cannot steer, and slashing that burns stake, are roadmap item 4 and gate the main network.',
+        tags: ['BLS multisig', 'bn256', '> 2/3 finality', '10 s blocks'],
+        steps: ['propose', 'vote', 'aggregate BLS', '> 2/3 signed', 'final', 'next proposer'] },
+      { id: 'shards', layer: 'chain', name: 'Beacon and shards', st: 'live', stl: 'Live · 1 of up to 32 shards',
+        body: 'A beacon chain coordinates the shard chains: it assigns validators, carries cross-shard transfers and bridge instructions, and mints rewards. Designed for up to 32 shards, each with a committee of up to 32 validators; the shard count is fixed when a network is created. Committees are re-drawn every epoch of 50 beacon blocks, about 8 minutes, from the staked pool.',
+        gap: 'The devnet runs one shard, and 5 of 7 shard seats and all 4 beacon seats are fixed; opening them is roadmap item 1. The beacon is the part that must scale with the shard count.',
+        tags: ['beacon chain', 'shard committees', 'epoch = 50 blocks', 'cross-shard'] },
+      { id: 'staking', layer: 'chain', name: 'Staking and seats', st: 'live', stl: 'Live · slashing planned',
+        body: 'A staking transaction burns 21,000 ZEP for a shard seat; a beacon seat needs 210,000 or more and an existing shard seat. A validator moves from candidate to syncing to pending to committee, and loses its seat at the end of an epoch if it misses too many signatures. The stake is returned on exit.',
+        gap: 'A removed validator gets its full stake back today. Burning part of it is planned.',
+        tags: ['21,000 ZEP per shard seat', '210,000 ZEP beacon minimum', 'epoch rotation'],
+        steps: ['stake tx', 'candidate', 'syncing', 'pending', 'committee', 'earn'] },
+      { id: 'privacy', layer: 'chain', name: 'Private transactions', st: 'live', stl: 'Live · inherited, unchanged',
+        body: 'Transaction version 2. Outputs go to one-time addresses. Amounts are Pedersen commitments on edwards25519, proved in range with Bulletproofs. An MLSAG ring signature of size 8 hides which input is really spent; a serial number per spend prevents double-spending. The amount is encrypted to the receiver’s viewing key.',
+        gap: 'Ring size and decoy selection are inherited; larger rings and a shielded pool are roadmap items 2 and 6.',
+        tags: ['one-time address', 'Pedersen commitment', 'Bulletproofs', 'MLSAG · ring 8', 'serial number'],
+        steps: ['one-time output', 'commit amount', 'Bulletproof', 'MLSAG over 8', 'serial number', 'verify, not identify'] },
+      { id: 'swap', layer: 'chain', name: 'SWAP', st: 'live', stl: 'Live',
+        body: 'Constant-product pools on the chain itself, quoted in ZEP, so any pair routes A → ZEP → B inside one transaction. The exchange fee schedule will be specified in a subsequent revision.',
+        gap: 'The pair and the sell amount of a trade are visible on-chain. Confidential trading is a capability to prove.',
+        tags: ['x · y = k', 'ZEP-quoted pools', '0.25 % per route'] },
+      { id: 'issuance', layer: 'chain', name: 'Issuance and rewards', st: 'live', stl: 'Live · split pending',
+        body: 'Each shard block mints a fixed reward that falls 10 % a year for 21 years; fees join the same pool. Target split: equal thirds to validators, liquidity providers and the DAO, with 31,000,000 ZEP created once at genesis. Rewards accrue per address and are claimed with a withdraw transaction.',
+        gap: 'The devnet still mints under the older validator and foundation split; it is reset before the public testnet.',
+        tags: ['−10 % a year', '21 years', '1,000,000,000 cap'] }
+    ];
+    const byId = {}; const chips = [];
+    parts.forEach(p => {
+      byId[p.id] = p;
+      const host = stack.querySelector('.layer[data-layer="' + p.layer + '"] .chips');
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.dataset.id = p.id; b.setAttribute('aria-pressed', 'false');
+      b.innerHTML = '<i class="sd ' + p.st + '"></i>' + p.name;
+      b.addEventListener('click', () => show(p.id));
+      host.appendChild(b); chips.push(b);
+    });
+    const detail = document.getElementById('stackDetail');
+    function show(id) {
+      const p = byId[id];
+      detail.innerHTML = '<div class="hd"><h4>' + p.name + '</h4><span class="status ' + p.st + '"><i class="sd ' + p.st + '"></i>' + p.stl + '</span></div>'
+        + '<p>' + p.body + '</p>'
+        + (p.steps ? '<ol class="steps">' + p.steps.map(x => '<li>' + x + '</li>').join('') + '</ol>' : '')
+        + '<div class="tags">' + p.tags.map(t => '<span>' + t + '</span>').join('') + '</div>'
+        + (p.gap ? '<p class="gap"><b>Roadmap.</b> ' + p.gap + '</p>' : '');
+      chips.forEach(c => c.setAttribute('aria-pressed', String(c.dataset.id === id)));
+    }
+    show('consensus');
+  })();
+
+  /* Figure 5: capacity */
+  (() => {
+    const grid = document.getElementById('capGrid'); if (!grid) return;
+    const MAXS = 32, SEATS = 32, BSEATS = 32, SHARD_STAKE = 21000, BEACON_STAKE = 210000, BLOCK_KB = 2048, INTERVAL = 10;
+    const sh = document.getElementById('shards'), shOut = document.getElementById('shardsOut'), kb = document.getElementById('txkb'), read = document.getElementById('capRead'), line = document.getElementById('capLine');
+    const cells = [];
+    const b = document.createElement('div'); b.className = 'cell beacon on'; b.textContent = 'B'; b.title = 'Beacon'; grid.appendChild(b);
+    for (let i = 1; i <= MAXS; i++) { const c = document.createElement('div'); c.className = 'cell'; c.textContent = i; c.title = 'Shard ' + i; grid.appendChild(c); cells.push(c); }
+    const n = x => Math.round(x).toLocaleString('en-US');
+    const tile = (k, v, sm) => '<div><div class="k">' + k + '</div><div class="v">' + v + '<small>' + sm + '</small></div></div>';
+    function draw() {
+      const sN = Math.max(1, Math.min(MAXS, Math.round(+sh.value) || 1));
+      let k = parseFloat(kb.value); if (!isFinite(k) || k <= 0) k = 2;
+      shOut.textContent = String(sN);
+      cells.forEach((c, i) => c.classList.toggle('on', i < sN));
+      const seats = sN * SEATS + BSEATS, stake = sN * SEATS * SHARD_STAKE + BSEATS * BEACON_STAKE, data = sN * BLOCK_KB / 1024, tps = sN * BLOCK_KB / k / INTERVAL;
+      read.innerHTML = tile('Validator seats', n(seats), sN + ' × ' + SEATS + ' shard + ' + BSEATS + ' beacon')
+        + tile('Stake at the seats', (stake / 1e6).toFixed(1) + 'M ZEP', (100 * stake / 1e9).toFixed(1) + ' % of cap')
+        + tile('Data per block round', n(data) + ' MB / 10 s', '2 MB per shard block')
+        + tile('Transfers per second', '≈ ' + n(tps), 'ceiling at ' + k + ' KB each');
+      line.innerHTML = '<b>Today</b> the devnet runs 1 shard with 7 shard seats and 4 beacon seats, a ceiling of about ' + n(BLOCK_KB / k / INTERVAL) + ' transfers a second. <b>At ' + sN + ' shard' + (sN > 1 ? 's' : '') + '</b> the same code confirms ' + n(data) + ' MB every ten seconds, about ' + n(tps) + ' transfers a second, with ' + n(seats) + ' seats and ' + (stake / 1e6).toFixed(1) + 'M ZEP at stake.';
+    }
+    sh.addEventListener('input', draw); kb.addEventListener('input', draw); draw();
+  })();
+
+  /* Figure 6: who sees what */
+  const parties = ['You', 'Counter-party', 'Operator', 'Network', 'Public', 'Compelled authority'];
+  const facts = ['Who you are', 'Your balance', 'Payment amount', 'Counterparty', 'Full history'];
+  // 2 = sees, 1 = partly, 0 = hidden; optional note on a cell as [value, note]
+  const models = {
+    bank: {
+      note: '<b>Bank account.</b> The operator sees everything by construction, and anyone with legal power over the operator sees it too. Privacy from the public is real; privacy from the institution does not exist.',
+      rows: [
+        [2, [1, 'Your name travels with most transfers'], 2, [1, 'Correspondents and card networks see sender and recipient'], 0, 2],
+        [2, 0, 2, 0, 0, 2],
+        [2, 2, 2, 2, 0, 2],
+        [2, 2, 2, 2, 0, 2],
+        [2, 0, 2, [1, 'Each network sees the slice it carried'], 0, 2]
+      ]
+    },
+    chain: {
+      note: '<b>Public blockchain.</b> Pseudonymous, not private. Every amount, balance and counterparty is public forever; identity is one exchange record or one careless payment away from being attached to it.',
+      rows: [
+        [2, [1, 'An address, plus whatever you have told them'], [1, 'Addresses and your connection metadata'], 0, [1, 'Pseudonymous, but addresses are linkable'], [1, 'Through exchanges and analytics']],
+        [2, 2, 2, 2, 2, 2],
+        [2, 2, 2, 2, 2, 2],
+        [2, 2, 2, 2, 2, 2],
+        [2, 2, 2, 2, 2, 2]
+      ]
+    },
+    zep: {
+      note: '<b>ZEP on Zephyrium.</b> Privacy from the public and from the operator. Half marks are the honest cases: the person you pay knows you paid them, an on-ramp knows who you are, and a viewing key shows an authority exactly what you handed over. Known gaps today: swap pair and sell amount are visible, bridge entries and exits are public on Ethereum, and the relay can see which node sent a transaction.',
+      rows: [
+        [2, [1, 'Only what you tell them'], [1, 'No account; connection metadata only'], [1, 'Connection metadata via the relay, until replaced'], 0, [1, 'Through on-ramps, bridge exits or your own disclosure']],
+        [2, 0, 0, 0, 0, [1, 'Only with a viewing key you provide']],
+        [2, 2, 0, [0, 'Committed, not written'], 0, [1, 'Only with a per-payment proof or viewing key']],
+        [2, [1, 'They know they were paid; one-time address'], 0, [0, 'The real spend hides among decoys'], 0, [1, 'Only with a viewing key you provide']],
+        [2, 0, 0, 0, 0, [1, 'Only with a viewing key you provide']]
+      ]
+    }
+  };
+  const grid = document.getElementById('wswGrid');
+  const note = document.getElementById('wswNote');
+  const segBtns = Array.from(document.querySelectorAll('[data-model]'));
+  function drawModel(key) {
+    const m = models[key];
+    const cells = ['<div class="h" aria-hidden="true"></div>'];
+    parties.forEach(p => cells.push('<div class="h">' + p + '</div>'));
+    m.rows.forEach((row, i) => {
+      cells.push('<div class="r">' + facts[i] + '</div>');
+      row.forEach((c, j) => {
+        const v = Array.isArray(c) ? c[0] : c;
+        const n = Array.isArray(c) ? c[1] : '';
+        const label = (v === 2 ? 'sees' : v === 1 ? 'partly sees' : 'cannot see') + ' ' + facts[i].toLowerCase();
+        cells.push('<div' + (n ? ' title="' + n.replace(/"/g, '&quot;') + '"' : '') + '><i class="dot v' + v + '" role="img" aria-label="' + parties[j] + ' ' + label + (n ? ': ' + n.replace(/"/g, '&quot;') : '') + '"></i></div>');
+      });
+    });
+    grid.innerHTML = cells.join('');
+    note.innerHTML = m.note;
+    segBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.model === key)));
+  }
+  segBtns.forEach(b => b.addEventListener('click', () => drawModel(b.dataset.model)));
+  drawModel('zep');
+
+  /* Figure 7: issuance */
+  (() => {
+    const svg = document.getElementById('issSvg'); if (!svg) return;
+    const CAP = 1e9, ICO = 0.031 * CAP, MINT = CAP - ICO, YEARS = 21, DECAY = 0.9, BLOCKS = 365 * 24 * 360; /* 10 s blocks: 3,153,600 a year */
+    const SH = { val: 1 / 3, lp: 1 / 3, dao: 1 / 3 };
+    const y1 = MINT * (1 - DECAY) / (1 - Math.pow(DECAY, YEARS));
+    const yearly = []; for (let i = 0; i < YEARS; i++) yearly.push(y1 * Math.pow(DECAY, i));
+    const cum = [0]; yearly.forEach(v => cum.push(cum[cum.length - 1] + v));
+    const NS = 'http://www.w3.org/2000/svg';
+    const W = 720, H = 300, L = 48, R = 122, T = 14, B = 30, PW = W - L - R, PH = H - T - B;
+    const X = y => L + PW * y / YEARS, Y = v => T + PH * (1 - v / CAP);
+    const el = (n, a, p) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); (p || svg).appendChild(e); return e; };
+    const defs = el('defs', {});
+    const pat = el('pattern', { id: 'issHatch', width: 6, height: 6, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' }, defs);
+    el('rect', { width: 6, height: 6, fill: 'var(--surface)' }, pat);
+    el('line', { x1: 0, y1: 0, x2: 0, y2: 6, stroke: 'var(--c-ico)', 'stroke-width': 2.2 }, pat);
+    [0, .25, .5, .75, 1].forEach(f => {
+      el('line', { class: 'grid', x1: L, x2: L + PW, y1: Y(f * CAP), y2: Y(f * CAP) });
+      el('text', { class: 'axis', x: L - 6, y: Y(f * CAP) + 4, 'text-anchor': 'end' }).textContent = f === 0 ? '0' : f === 1 ? '1B' : (f * 1000) + 'M';
+    });
+    [0, 5, 10, 15, 21].forEach(y => { el('text', { class: 'axis', x: X(y), y: H - 10, 'text-anchor': y === 0 ? 'start' : 'middle' }).textContent = y === 0 ? 'genesis' : 'year ' + y; });
+    const base = () => 0, icoTop = () => ICO, valTop = t => ICO + cum[t] * SH.val, lpTop = t => ICO + cum[t] * (SH.val + SH.lp), daoTop = t => ICO + cum[t];
+    const area = (top, bot) => { let d = ''; for (let t = 0; t <= YEARS; t++) d += (t ? 'L' : 'M') + X(t).toFixed(1) + ' ' + Y(top(t)).toFixed(1); for (let t = YEARS; t >= 0; t--) d += 'L' + X(t).toFixed(1) + ' ' + Y(bot(t)).toFixed(1); return d + 'Z'; };
+    el('path', { class: 'area', d: area(icoTop, base), fill: 'url(#issHatch)', stroke: 'var(--c-ico)', 'stroke-width': 1 });
+    el('path', { class: 'area', d: area(valTop, icoTop), fill: 'var(--c-val)' });
+    el('path', { class: 'area', d: area(lpTop, valTop), fill: 'var(--c-lp)' });
+    el('path', { class: 'area', d: area(daoTop, lpTop), fill: 'var(--c-dao)' });
+    const fM = n => n >= 999.95e6 ? (n / 1e9).toFixed(2) + 'B' : (n / 1e6).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + 'M';
+    const pct = n => (100 * n / CAP).toFixed(1) + ' %';
+    [['DAO', daoTop, lpTop, 'var(--c-dao)'], ['Liquidity', lpTop, valTop, 'var(--c-lp)'], ['Validators', valTop, icoTop, 'var(--c-val)'], ['ICO', icoTop, base, 'var(--c-ico)']].forEach(([name, top, bot, c]) => {
+      const ym = (Y(top(YEARS)) + Y(bot(YEARS))) / 2;
+      el('rect', { x: L + PW + 8, y: ym - 4, width: 8, height: 8, rx: 2, fill: c });
+      el('text', { class: 'lbl', x: L + PW + 21, y: ym + 4 }).textContent = name + ' ' + fM(top(YEARS) - bot(YEARS));
+    });
+    const mk = el('g', { class: 'marker' });
+    const ml = el('line', { y1: T, y2: T + PH }, mk);
+    const tops = [icoTop, valTop, lpTop, daoTop], cols = ['var(--c-ico)', 'var(--c-val)', 'var(--c-lp)', 'var(--c-dao)'];
+    const dots = tops.map((f, i) => el('circle', { r: 4, fill: cols[i] }, mk));
+    const yr = document.getElementById('yr'), yrOut = document.getElementById('yrOut'), read = document.getElementById('issRead'), line = document.getElementById('issLine');
+    const tile = (k, cls, n, flat) => '<div><div class="k"><i class="sw ' + cls + '"></i>' + k + '</div><div class="v">' + fM(n) + '<small>' + pct(n) + ' of cap' + (flat ? ' · fixed' : '') + '</small></div></div>';
+    function draw(t) {
+      t = Math.max(0, Math.min(YEARS, Math.round(t) || 0));
+      yr.value = t; yrOut.textContent = t === 0 ? '0 · genesis' : String(t);
+      ml.setAttribute('x1', X(t)); ml.setAttribute('x2', X(t));
+      tops.forEach((f, i) => { dots[i].setAttribute('cx', X(t)); dots[i].setAttribute('cy', Y(f(t))); });
+      const v = cum[t] * SH.val, l = cum[t] * SH.lp, d = cum[t] * SH.dao, tot = ICO + cum[t];
+      read.innerHTML = tile('ICO · genesis', 'ico', ICO, true) + tile('Validators', 'val', v) + tile('Liquidity', 'lp', l) + tile('DAO', 'dao', d);
+      const rew = yearly[t === 0 ? 0 : t - 1] / BLOCKS;
+      line.innerHTML = (t === 0
+        ? '<b>At genesis</b> 31.0M ZEP exist, all of it the ICO. The first block mints '
+        : '<b>End of year ' + t + ':</b> ' + fM(tot) + ' ZEP in circulation, ' + pct(tot) + ' of the cap. A block in year ' + t + ' mints ')
+        + '<b>' + rew.toFixed(2) + ' ZEP</b>: ' + (rew * SH.val).toFixed(2) + ' to validators, ' + (rew * SH.lp).toFixed(2) + ' to liquidity, ' + (rew * SH.dao).toFixed(2) + ' to the DAO.';
+    }
+    const fromPointer = e => { const r = svg.getBoundingClientRect(); const x = (e.clientX - r.left) * W / r.width; draw((x - L) / PW * YEARS); };
+    svg.addEventListener('pointermove', fromPointer);
+    svg.addEventListener('pointerdown', fromPointer);
+    yr.addEventListener('input', () => draw(+yr.value));
+    const tb = document.getElementById('issTbody');
+    let rows = '<tr><td>genesis</td><td>–</td><td>31.0M (ICO)</td><td>31.0M</td><td>3.1 %</td></tr>';
+    for (let i = 0; i < YEARS; i++) { const c = ICO + cum[i + 1]; rows += '<tr><td>' + (i + 1) + '</td><td>' + (yearly[i] / BLOCKS).toFixed(3) + '</td><td>' + fM(yearly[i]) + '</td><td>' + fM(c) + '</td><td>' + pct(c) + '</td></tr>'; }
+    tb.innerHTML = rows;
+    draw(YEARS);
+  })();
+
+  /* Figure 8: phases */
+  const phases = {
+    p1: { lead: 'Security before scale. Independent operators run validators under rules that do not depend on who they are. Inherited central keys are removed, fixed seats are opened, the relay is replaced, and a public test network follows.',
+          contribute: 'Run a validator, hold the stake, keep uptime.', earn: 'The validator share of every block, one third of all issuance, plus the security share of fees. Earned by participation, not by running an RPC.', move: 'Independent operators rather than more processes; reliable settlement; tested onboarding and recovery.' },
+    p2: { lead: 'Usable markets before mass adoption. Shielded Ethereum assets flow through an audited bridge on main-network Ethereum. Pools quoted in ZEP reach a depth at which real trade sizes clear without surprise.',
+          contribute: 'Supply liquidity to eligible pools and keep it there under the pool rules.', earn: 'The liquidity share of every block, one third of all issuance, spread across eligible ZEP-quoted pools, plus the 80% share of actual swap fees. Fees are from use; the block share is from issuance.', move: 'Depth that survives lower incentives; tested deposits and exits; fees legible across a whole route.' },
+    p3: { lead: 'The connector opens. Hold, send, swap, shield and disclose through one client that performs none of a bank’s jobs itself. Every privacy label on every screen is accurate, including the gaps.',
+          contribute: 'Use it for real financial life and tell us where it fails you.', earn: 'Nothing for use itself. A contributor who grows the product, by bringing merchants, integrations or users, is compensated by the DAO for that work under the third pillar. No return for holding; no interest.', move: 'Retained users, successful exits, honest labels, and the regulated parties for any regulated service named per market.' },
+    p4: { lead: 'The second pillar. Zero-knowledge statements let a person prove eligibility, age, residency or standing without surrendering a dossier. Same keys, same proofs, same verifier that learns only the answer.',
+          contribute: 'Issue and accept credentials; build services that ask for a proof instead of a file.', earn: 'Builders of credential services are paid by the DAO for work delivered, and by fees where a service charges them. Nothing is minted for identity.', move: 'A person can open a regulated service inside ZEP and the service learns one fact, not a history.' }
+  };
+  const panel = document.getElementById('phasePanel');
+  const phaseBtns = Array.from(document.querySelectorAll('[data-phase]'));
+  function drawPhase(k) {
+    const p = phases[k];
+    panel.innerHTML = '<p>' + p.lead + '</p><dl><div><dt>Contribution</dt><dd>' + p.contribute + '</dd></div><div><dt>Reward and its source</dt><dd>' + p.earn + '</dd></div><div><dt>What moves us on</dt><dd>' + p.move + '</dd></div></dl>';
+    phaseBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.phase === k)));
+  }
+  phaseBtns.forEach(b => b.addEventListener('click', () => drawPhase(b.dataset.phase)));
+  drawPhase('p1');
+})();
+</script>
